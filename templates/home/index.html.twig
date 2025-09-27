@@ -1,0 +1,90 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Slotify - Premium Casino Experience{% endblock %}
+
+{% block body %}
+<div class="relative overflow-hidden">
+    <!-- Hero Section -->
+    <div class="relative bg-gradient-to-br from-gray-900 via-gray-800 to-cyan-900">
+        <div class="absolute inset-0 bg-black/20"></div>
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+            <div class="text-center">
+                <h1 class="text-5xl md:text-7xl font-bold text-white mb-6">
+                    Welcome to <span class="text-cyan-400">Slotify</span>
+                </h1>
+                <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
+                    Experience the thrill of premium slot games with cutting-edge graphics and massive jackpots
+                </p>
+                
+                {% if not app.user %}
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                        <a href="{{ path('app_register') }}" class="btn-primary text-lg px-8 py-4">
+                            🎰 Start Playing Now
+                        </a>
+                        <a href="{{ path('app_login') }}" class="btn-secondary text-lg px-8 py-4">
+                            Sign In
+                        </a>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <p class="text-sm text-gray-400">
+                            First time setup? <a href="{{ path('app_setup') }}" class="text-cyan-400 hover:text-cyan-300">Initialize Database</a>
+                        </p>
+                    </div>
+                {% else %}
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                        <a href="#" class="btn-primary text-lg px-8 py-4">
+                            🎮 Play Games
+                        </a>
+                        <div class="text-cyan-400 text-xl font-semibold">
+                            Balance: ${{ app.user.balance|number_format(2) }}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="py-24 bg-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-white mb-4">Why Choose Slotify?</h2>
+                <p class="text-xl text-gray-400">Premium gaming experience with unmatched features</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="card p-8 text-center">
+                    <div class="text-4xl mb-4">🎯</div>
+                    <h3 class="text-xl font-semibold text-white mb-3">High RTP Games</h3>
+                    <p class="text-gray-400">Enjoy games with industry-leading return-to-player rates for better winning chances</p>
+                </div>
+                
+                <div class="card p-8 text-center">
+                    <div class="text-4xl mb-4">💎</div>
+                    <h3 class="text-xl font-semibold text-white mb-3">Premium Graphics</h3>
+                    <p class="text-gray-400">Stunning visuals and smooth animations for an immersive gaming experience</p>
+                </div>
+                
+                <div class="card p-8 text-center">
+                    <div class="text-4xl mb-4">🔒</div>
+                    <h3 class="text-xl font-semibold text-white mb-3">Secure & Fair</h3>
+                    <p class="text-gray-400">Provably fair gaming with advanced security measures to protect your funds</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    {% if not app.user %}
+    <div class="py-16 bg-gradient-to-r from-cyan-600 to-blue-600">
+        <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-white mb-4">Ready to Win Big?</h2>
+            <p class="text-xl text-cyan-100 mb-8">Join thousands of players and start your winning journey today</p>
+            <a href="{{ path('app_register') }}" class="bg-white text-cyan-600 font-bold py-4 px-8 rounded-lg hover:bg-gray-100 transition-colors text-lg">
+                Create Free Account
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
