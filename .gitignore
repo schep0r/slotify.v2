@@ -12,6 +12,9 @@
 ###> phpunit/phpunit ###
 /phpunit.xml
 /.phpunit.cache/
+/coverage/
+/coverage.xml
+/junit.xml
 ###< phpunit/phpunit ###
 
 ###> symfony/asset-mapper ###

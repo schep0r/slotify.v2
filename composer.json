@@ -87,6 +87,13 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
+        ],
+        "test": "php bin/phpunit",
+        "test-coverage": "XDEBUG_MODE=coverage php bin/phpunit --coverage-text --coverage-clover=coverage.xml",
+        "test-coverage-html": "XDEBUG_MODE=coverage php bin/phpunit --coverage-html=coverage",
+        "check-coverage": [
+            "@test-coverage",
+            "php bin/check-coverage"
         ]
     },
     "conflict": {

@@ -85,6 +85,44 @@ npm run build-css
 npm run build-css-prod
 ```
 
+### Testing & Code Coverage
+
+The project includes comprehensive testing with code coverage enforcement:
+
+```bash
+# Run all tests
+composer test
+
+# Run tests with coverage report
+composer test-coverage
+
+# Run tests with HTML coverage report
+composer test-coverage-html
+
+# Run tests and check coverage threshold
+composer check-coverage
+```
+
+#### Coverage Requirements
+- **Minimum Coverage**: 6% (enforced in CI/CD)
+- **Current Coverage**: ~6.4% (115/1793 lines)
+- **Coverage Reports**: Generated in `coverage/` directory
+
+#### GitHub Actions
+The project uses GitHub Actions for continuous integration:
+- Runs on PHP 8.2 with PostgreSQL 15
+- Executes all tests with coverage reporting
+- Enforces minimum coverage threshold
+- Uploads coverage reports to Codecov
+- Publishes test results as artifacts
+
+#### Local Coverage Check
+```bash
+# Generate coverage and check threshold
+XDEBUG_MODE=coverage php bin/phpunit --coverage-clover=coverage.xml
+php bin/check-coverage
+```
+
 ### Database Management
 - Visit `/setup` to initialize database
 - SQLite database stored in `var/data_dev.db`
