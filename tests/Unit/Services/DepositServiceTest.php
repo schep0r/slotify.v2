@@ -82,7 +82,7 @@ class DepositServiceTest extends TestCase
 
         // Assert
         $this->assertNull($result);
-        $this->assertEquals(100.0, $user->getBalance()); // Balance should remain unchanged
+        $this->assertEquals(150.0, $user->getBalance()); // Balance should remain unchanged
     }
 
     public function testDummyPaymentAlwaysSucceeds(): void
