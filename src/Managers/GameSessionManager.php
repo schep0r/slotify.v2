@@ -9,6 +9,7 @@ use App\Entity\GameSession;
 use App\Entity\User;
 use App\Repository\GameSessionRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Uuid;
 
 class GameSessionManager
@@ -21,7 +22,7 @@ class GameSessionManager
     ) {
     }
 
-    public function getOrCreateUserSession(User $user, Game $game): GameSession
+    public function getOrCreateUserSession(UserInterface $user, Game $game): GameSession
     {
         $activeSession = $this->gameSessionRepository->findOneBy([
             'player' => $user,
@@ -46,7 +47,7 @@ class GameSessionManager
         return $activeSession;
     }
 
-    public function startGameSession(User $user, Game $game): GameSession
+    public function startGameSession(UserInterface $user, Game $game): GameSession
     {
         $gameSession = new GameSession();
         $gameSession

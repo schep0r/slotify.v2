@@ -1,0 +1,202 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Transaction History - {{ parent() }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .transaction-card {
+            @apply bg-gray-800 rounded-lg p-4 border-l-4 transition-all duration-200 hover:bg-gray-750;
+        }
+        .transaction-deposit { @apply border-l-green-500; }
+        .transaction-bonus { @apply border-l-purple-500; }
+        .transaction-bet { @apply border-l-red-500; }
+        .transaction-win { @apply border-l-yellow-500; }
+        .transaction-withdrawal { @apply border-l-blue-500; }
+        .transaction-refund { @apply border-l-orange-500; }
+        .transaction-adjustment { @apply border-l-gray-500; }
+        
+        .filter-btn {
+            @apply px-4 py-2 rounded-lg font-medium transition-colors duration-200;
+        }
+        .filter-btn.active {
+            @apply bg-cyan-600 text-white;
+        }
+        .filter-btn:not(.active) {
+            @apply bg-gray-700 text-gray-300 hover:bg-gray-600;
+        }
+        
+        .pagination-btn {
+            @apply px-3 py-2 rounded-lg font-medium transition-colors duration-200;
+        }
+        .pagination-btn.active {
+            @apply bg-cyan-600 text-white;
+        }
+        .pagination-btn:not(.active) {
+            @apply bg-gray-700 text-gray-300 hover:bg-gray-600;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-white mb-2">📊 Transaction History</h1>
+            <p class="text-gray-400">Track all your account activity</p>
+            <div class="mt-4 p-4 bg-gray-800 rounded-lg inline-block">
+                <p class="text-sm text-gray-300">Current Balance:</p>
+                <p class="text-2xl font-bold text-cyan-400">${{ app.user.balance|number_format(2) }}</p>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="mb-6">
+            <div class="flex flex-wrap gap-2 justify-center">
+                <a href="{{ path('app_transactions') }}" 
+                   class="filter-btn {{ currentType is null ? 'active' : '' }}">
+                    All Transactions
+                </a>
+                <a href="{{ path('app_transactions', {type: 'deposit'}) }}" 
+                   class="filter-btn {{ currentType == 'deposit' ? 'active' : '' }}">
+                    💰 Deposits
+                </a>
+                <a href="{{ path('app_transactions', {type: 'bonus'}) }}" 
+                   class="filter-btn {{ currentType == 'bonus' ? 'active' : '' }}">
+                    🎁 Bonuses
+                </a>
+                <a href="{{ path('app_transactions', {type: 'bet'}) }}" 
+                   class="filter-btn {{ currentType == 'bet' ? 'active' : '' }}">
+                    🎰 Bets
+                </a>
+                <a href="{{ path('app_transactions', {type: 'win'}) }}" 
+                   class="filter-btn {{ currentType == 'win' ? 'active' : '' }}">
+                    🏆 Wins
+                </a>
+                <a href="{{ path('app_transactions', {type: 'withdrawal'}) }}" 
+                   class="filter-btn {{ currentType == 'withdrawal' ? 'active' : '' }}">
+                    💸 Withdrawals
+                </a>
+            </div>
+        </div>
+
+        <!-- Transaction Count -->
+        <div class="text-center mb-6">
+            <p class="text-gray-400">
+                Showing {{ transactions|length }} of {{ totalTransactions }} transactions
+                {% if currentType %}for {{ currentType|title }}{% endif %}
+            </p>
+        </div>
+
+        <!-- Transactions List -->
+        {% if transactions|length > 0 %}
+            <div class="space-y-4 mb-8">
+                {% for transaction in transactions %}
+                    <div class="transaction-card transaction-{{ transaction.type }}">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-3 mb-2">
+                                    <div class="text-2xl">
+                                        {% if transaction.type == 'deposit' %}💰
+                                        {% elseif transaction.type == 'bonus' %}🎁
+                                        {% elseif transaction.type == 'bet' %}🎰
+                                        {% elseif transaction.type == 'win' %}🏆
+                                        {% elseif transaction.type == 'withdrawal' %}💸
+                                        {% elseif transaction.type == 'refund' %}🔄
+                                        {% else %}📝
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-semibold text-white">
+                                            {{ transaction.type|title }}
+                                            {% if transaction.type == 'deposit' and transaction.paymentMethod %}
+                                                via {{ transaction.paymentMethod|title }}
+                                            {% endif %}
+                                        </h3>
+                                        {% if transaction.description %}
+                                            <p class="text-sm text-gray-400">{{ transaction.description }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center space-x-4 text-sm text-gray-300">
+                                    <span>{{ transaction.createdAt|date('M j, Y g:i A') }}</span>
+                                    <span>ID: {{ transaction.referenceId }}</span>
+                                    <span class="px-2 py-1 rounded text-xs
+                                        {% if transaction.status == 'completed' %}bg-green-800 text-green-200
+                                        {% elseif transaction.status == 'pending' %}bg-yellow-800 text-yellow-200
+                                        {% elseif transaction.status == 'failed' %}bg-red-800 text-red-200
+                                        {% else %}bg-gray-700 text-gray-300
+                                        {% endif %}">
+                                        {{ transaction.status|title }}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="text-right">
+                                <div class="text-xl font-bold
+                                    {% if transaction.type in ['deposit', 'bonus', 'win', 'refund'] %}text-green-400
+                                    {% else %}text-red-400
+                                    {% endif %}">
+                                    {% if transaction.type in ['deposit', 'bonus', 'win', 'refund'] %}+{% else %}-{% endif %}${{ transaction.amount|number_format(2) }}
+                                </div>
+                                <div class="text-sm text-gray-400">
+                                    Balance: ${{ transaction.balanceAfter|number_format(2) }}
+                                </div>
+                                <a href="{{ path('app_transaction_details', {id: transaction.id}) }}" 
+                                   class="text-xs text-cyan-400 hover:text-cyan-300">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if totalPages > 1 %}
+                <div class="flex justify-center space-x-2">
+                    {% if currentPage > 1 %}
+                        <a href="{{ path('app_transactions', {page: currentPage - 1, type: currentType}) }}" 
+                           class="pagination-btn">← Previous</a>
+                    {% endif %}
+                    
+                    {% for page in 1..totalPages %}
+                        {% if page == currentPage %}
+                            <span class="pagination-btn active">{{ page }}</span>
+                        {% elseif page == 1 or page == totalPages or (page >= currentPage - 2 and page <= currentPage + 2) %}
+                            <a href="{{ path('app_transactions', {page: page, type: currentType}) }}" 
+                               class="pagination-btn">{{ page }}</a>
+                        {% elseif page == currentPage - 3 or page == currentPage + 3 %}
+                            <span class="pagination-btn">...</span>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if currentPage < totalPages %}
+                        <a href="{{ path('app_transactions', {page: currentPage + 1, type: currentType}) }}" 
+                           class="pagination-btn">Next →</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-12">
+                <div class="text-6xl mb-4">📊</div>
+                <h2 class="text-2xl font-bold text-white mb-4">No Transactions Found</h2>
+                <p class="text-gray-400 mb-6">
+                    {% if currentType %}
+                        No {{ currentType }} transactions found.
+                    {% else %}
+                        You haven't made any transactions yet.
+                    {% endif %}
+                </p>
+                {% if not currentType %}
+                    <a href="{{ path('app_deposit') }}" class="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200">
+                        Make Your First Deposit
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

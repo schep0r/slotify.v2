@@ -7,6 +7,7 @@ namespace App\Managers;
 use App\Entity\FreeSpin;
 use App\Entity\FreeSpinTransaction;
 use App\Entity\User;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class FreeSpinManager
 {
@@ -23,7 +24,7 @@ class FreeSpinManager
         array $metadata = [],
     ): FreeSpin {
         return FreeSpin::create([
-            'user_id' => $user->id,
+            'user_id' => $user->getId(),
             'amount' => $amount,
             'source' => $source,
             'bet_value' => $betValue,
@@ -36,9 +37,9 @@ class FreeSpinManager
     /**
      * Get user's available free spins for a specific game.
      */
-    public function getAvailableFreeSpins(User $user, ?int $gameId = null): int
+    public function getAvailableFreeSpins(UserInterface $user, ?int $gameId = null): int
     {
-        $query = FreeSpin::where('user_id', $user->id)->valid();
+        $query = FreeSpin::where('user_id', $user->getId())->valid();
 
         if ($gameId) {
             $query->forGame($gameId);
@@ -50,9 +51,9 @@ class FreeSpinManager
     /**
      * Get user's free spin records.
      */
-    public function getUserFreeSpins(User $user, ?string $gameId = null)
+    public function getUserFreeSpins(UserInterface $user, ?string $gameId = null)
     {
-        $query = FreeSpin::where('user_id', $user->id)->valid();
+        $query = FreeSpin::where('user_id', $user->getId())->valid();
 
         if ($gameId) {
             $query->forGame($gameId);
@@ -67,14 +68,14 @@ class FreeSpinManager
      * Use a free spin.
      */
     public function useFreeSpin(
-        User $user,
-        string $gameId,
+        UserInterface $user,
+        int $gameId,
         array $spinResult,
         float $winAmount = 0,
     ): ?FreeSpinTransaction {
         return DB::transaction(function () use ($user, $gameId, $spinResult, $winAmount) {
             // Find the oldest valid free spin for this game
-            $freeSpin = FreeSpin::where('user_id', $user->id)
+            $freeSpin = FreeSpin::where('user_id', $user->getId())
                 ->valid()
                 ->forGame($gameId)
                 ->orderBy('expires_at', 'asc')
@@ -90,7 +91,7 @@ class FreeSpinManager
 
             // Create transaction record
             $transaction = FreeSpinTransaction::create([
-                'user_id' => $user->id,
+                'user_id' => $user->getId(),
                 'free_spin_id' => $freeSpin->id,
                 'game_id' => $gameId,
                 'bet_amount' => $freeSpin->bet_value ?? 0,
@@ -123,10 +124,10 @@ class FreeSpinManager
      */
     public function getUserFreeSpinStats(User $user): array
     {
-        $totalAwarded = FreeSpin::where('user_id', $user->id)->sum('amount');
-        $totalUsed = FreeSpin::where('user_id', $user->id)->sum('used_amount');
+        $totalAwarded = FreeSpin::where('user_id', $user->getId())->sum('amount');
+        $totalUsed = FreeSpin::where('user_id', $user->getId())->sum('used_amount');
         $totalAvailable = $this->getAvailableFreeSpins($user);
-        $totalWinnings = FreeSpinTransaction::where('user_id', $user->id)->sum('win_amount');
+        $totalWinnings = FreeSpinTransaction::where('user_id', $user->getId())->sum('win_amount');
 
         return [
             'total_awarded' => $totalAwarded,

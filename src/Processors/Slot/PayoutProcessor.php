@@ -155,7 +155,54 @@ class PayoutProcessor implements PayoutCalculatorInterface
 
     private function initConfigurations(Game $game): void
     {
-        $this->paylines = $game->paylinesConfiguration->value;
-        $this->paytable = $game->paytableConfiguration->value;
+        $this->paylines = $game->getPaylines() ?? $this->getDefaultPaylines();
+        $this->paytable = $game->getPaytable() ?? $this->getDefaultPaytable();
+    }
+
+    private function getDefaultPaylines(): array
+    {
+        // Default 25 paylines for a 5x3 slot
+        return [
+            [1, 1, 1, 1, 1], // Middle row
+            [0, 0, 0, 0, 0], // Top row
+            [2, 2, 2, 2, 2], // Bottom row
+            [0, 1, 2, 1, 0], // V shape
+            [2, 1, 0, 1, 2], // Inverted V
+            [1, 0, 0, 0, 1], // Top corners
+            [1, 2, 2, 2, 1], // Bottom corners
+            [0, 0, 1, 2, 2], // Diagonal up
+            [2, 2, 1, 0, 0], // Diagonal down
+            [1, 2, 1, 0, 1], // Zigzag
+            [1, 0, 1, 2, 1], // Inverted zigzag
+            [0, 1, 0, 1, 0], // Top zigzag
+            [2, 1, 2, 1, 2], // Bottom zigzag
+            [1, 1, 0, 1, 1], // Top dip
+            [1, 1, 2, 1, 1], // Bottom dip
+            [0, 0, 2, 0, 0], // Top corners bottom
+            [2, 2, 0, 2, 2], // Bottom corners top
+            [0, 2, 0, 2, 0], // Alternating top-bottom
+            [2, 0, 2, 0, 2], // Alternating bottom-top
+            [1, 0, 2, 0, 1], // Diamond
+            [1, 2, 0, 2, 1], // Inverted diamond
+            [0, 1, 1, 1, 0], // Top to middle
+            [2, 1, 1, 1, 2], // Bottom to middle
+            [0, 0, 1, 0, 0], // Top center dip
+            [2, 2, 1, 2, 2], // Bottom center dip
+        ];
+    }
+
+    private function getDefaultPaytable(): array
+    {
+        // Default paytable with multipliers for different symbol combinations
+        return [
+            '🍒' => [3 => 5, 4 => 25, 5 => 100],
+            '🍋' => [3 => 5, 4 => 25, 5 => 100],
+            '🍊' => [3 => 10, 4 => 50, 5 => 200],
+            '🍇' => [3 => 10, 4 => 50, 5 => 200],
+            '🔔' => [3 => 20, 4 => 100, 5 => 500],
+            '⭐' => [3 => 50, 4 => 250, 5 => 1000],
+            '💎' => [3 => 100, 4 => 500, 5 => 2000],
+            '7️⃣' => [3 => 200, 4 => 1000, 5 => 5000],
+        ];
     }
 }

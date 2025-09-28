@@ -13,8 +13,6 @@ interface GameLoggerInterface
      */
     public function logGameRound(
         GameSession $gameSession,
-        array $spinData,
-        float $betAmount,
-        array $visibleSymbols,
+        array $spinData
     ): void;
 }

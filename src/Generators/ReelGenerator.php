@@ -18,7 +18,9 @@ class ReelGenerator implements ReelGeneratorInterface
     public function generateReelPositions(Game $game): array
     {
         $positions = [];
-        foreach ($game->reelsConfiguration->value as $reel) {
+        $reels = $game->getReels() ?? $this->getDefaultReels();
+
+        foreach ($reels as $reel) {
             $positions[] = $this->rng->generateInt(0, count($reel) - 1);
         }
 
@@ -29,8 +31,8 @@ class ReelGenerator implements ReelGeneratorInterface
     {
         $positions = $this->generateReelPositions($game);
         $visible = [];
-        $reels = $game->reelsConfiguration->value;
-        $rows = $game->rowsConfiguration->value;
+        $reels = $game->getReels() ?? $this->getDefaultReels();
+        $rows = $game->getRows() ?? 3;
 
         foreach ($positions as $reelIndex => $position) {
             $reel = $reels[$reelIndex];
@@ -45,5 +47,17 @@ class ReelGenerator implements ReelGeneratorInterface
         }
 
         return new ReelVisibilityDto($positions, $visible);
+    }
+
+    private function getDefaultReels(): array
+    {
+        // Default 5-reel configuration with common slot symbols
+        return [
+            ['🍒', '🍋', '🍊', '🍇', '🔔', '⭐', '💎', '7️⃣', '🍒', '🍋'],
+            ['🍋', '🍊', '🍇', '🔔', '⭐', '💎', '7️⃣', '🍒', '🍋', '🍊'],
+            ['🍊', '🍇', '🔔', '⭐', '💎', '7️⃣', '🍒', '🍋', '🍊', '🍇'],
+            ['🍇', '🔔', '⭐', '💎', '7️⃣', '🍒', '🍋', '🍊', '🍇', '🔔'],
+            ['🔔', '⭐', '💎', '7️⃣', '🍒', '🍋', '🍊', '🍇', '🔔', '⭐'],
+        ];
     }
 }

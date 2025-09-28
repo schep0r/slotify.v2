@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\Contracts;
 
 use App\Entity\Game;
-use App\Entity\User;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 interface BetValidatorInterface
 {
     /**
      * Run all validating.
      */
-    public function validate(Game $game, User $user, float $betAmount): void;
+    public function validate(Game $game, UserInterface $user, float $betAmount): void;
 
     /**
      * Validate bet amount against game limits.
@@ -24,5 +24,5 @@ interface BetValidatorInterface
      *
      * @deprecated Balance validation is now handled by BalanceCheckMiddleware
      */
-    public function validateBalance(User $user, float $betAmount): void;
+    public function validateBalance(UserInterface $user, float $betAmount): void;
 }

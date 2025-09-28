@@ -32,8 +32,11 @@
                     </div>
                 {% else %}
                     <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                        <a href="#" class="btn-primary text-lg px-8 py-4">
+                        <a href="{{ path('app_games') }}" class="btn-primary text-lg px-8 py-4">
                             🎮 Play Games
+                        </a>
+                        <a href="{{ path('app_transactions') }}" class="btn-secondary text-lg px-8 py-4">
+                            📊 View History
                         </a>
                         <div class="text-cyan-400 text-xl font-semibold">
                             Balance: ${{ app.user.balance|number_format(2) }}

@@ -1,0 +1,114 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Deposit History - {{ parent() }}{% endblock %}
+
+{% block body %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-gray-800 rounded-lg shadow-xl p-8">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-white mb-2">💳 Deposit History</h1>
+                    <p class="text-gray-400">Track all your account deposits</p>
+                </div>
+                <a href="{{ path('app_deposit') }}" class="btn-primary">
+                    Make New Deposit
+                </a>
+            </div>
+
+            {% if deposits is empty %}
+                <div class="text-center py-12">
+                    <div class="text-6xl mb-4">📋</div>
+                    <h3 class="text-xl font-semibold text-gray-300 mb-2">No deposits yet</h3>
+                    <p class="text-gray-400 mb-6">You haven't made any deposits to your account.</p>
+                    <a href="{{ path('app_deposit') }}" class="btn-primary">
+                        Make Your First Deposit
+                    </a>
+                </div>
+            {% else %}
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-600">
+                                <th class="text-left py-3 px-4 text-gray-300 font-semibold">Date</th>
+                                <th class="text-left py-3 px-4 text-gray-300 font-semibold">Amount</th>
+                                <th class="text-left py-3 px-4 text-gray-300 font-semibold">Method</th>
+                                <th class="text-left py-3 px-4 text-gray-300 font-semibold">Status</th>
+                                <th class="text-left py-3 px-4 text-gray-300 font-semibold">Reference</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for deposit in deposits %}
+                                <tr class="border-b border-gray-700 hover:bg-gray-750 transition-colors">
+                                    <td class="py-4 px-4 text-gray-300">
+                                        {{ deposit.createdAt|date('M j, Y') }}
+                                        <div class="text-sm text-gray-500">{{ deposit.createdAt|date('g:i A') }}</div>
+                                    </td>
+                                    <td class="py-4 px-4">
+                                        <span class="text-lg font-semibold text-green-400">
+                                            ${{ deposit.amount|number_format(2) }}
+                                        </span>
+                                    </td>
+                                    <td class="py-4 px-4 text-gray-300">
+                                        <div class="flex items-center space-x-2">
+                                            {% set method = deposit.paymentMethod %}
+                                            <span class="text-lg">
+                                                {% if method == 'card' %}💳
+                                                {% elseif method == 'paypal' %}🅿️
+                                                {% else %}🔧
+                                                {% endif %}
+                                            </span>
+                                            <span>
+                                                {% if method == 'card' %}Credit/Debit Card
+                                                {% elseif method == 'paypal' %}PayPal
+                                                {% else %}Dummy Payment (Dev)
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-4">
+                                        {% set statusClass = deposit.status == 'completed' ? 'bg-green-800 text-green-200' : 
+                                                            (deposit.status == 'failed' ? 'bg-red-800 text-red-200' : 
+                                                            (deposit.status == 'pending' ? 'bg-yellow-800 text-yellow-200' : 'bg-gray-800 text-gray-200')) %}
+                                        <span class="px-2 py-1 rounded-full text-xs font-semibold {{ statusClass }}">
+                                            {{ deposit.status|title }}
+                                        </span>
+                                    </td>
+                                    <td class="py-4 px-4">
+                                        <code class="text-xs text-gray-400 bg-gray-700 px-2 py-1 rounded">
+                                            {{ deposit.referenceId }}
+                                        </code>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-8 p-4 bg-gray-700 rounded-lg">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-sm text-gray-400">Total Deposits</p>
+                            <p class="text-xl font-bold text-cyan-400">
+                                ${{ deposits|filter(d => d.status == 'completed')|reduce((carry, d) => carry + d.amount, 0)|number_format(2) }}
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-400">Successful Deposits</p>
+                            <p class="text-lg font-semibold text-green-400">
+                                {{ deposits|filter(d => d.status == 'completed')|length }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.btn-primary {
+    @apply bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-gray-900;
+}
+</style>
+{% endblock %}

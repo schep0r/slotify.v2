@@ -1,0 +1,90 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Games - {{ parent() }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .game-card {
+            @apply bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-105;
+        }
+        .game-card:hover {
+            @apply border border-cyan-400;
+        }
+        .play-btn {
+            @apply bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200;
+        }
+        .details-btn {
+            @apply bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container mx-auto px-4 py-8">
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-white mb-4">🎰 Casino Games</h1>
+        <p class="text-xl text-gray-400">Choose your favorite slot game and start winning!</p>
+        {% if app.user %}
+            <div class="mt-4 p-4 bg-gray-800 rounded-lg inline-block">
+                <p class="text-sm text-gray-300">Your Balance:</p>
+                <p class="text-2xl font-bold text-cyan-400">${{ app.user.balance|number_format(2) }}</p>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if games|length > 0 %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {% for game in games %}
+                <div class="game-card">
+                    <div class="p-6">
+                        <div class="text-center mb-4">
+                            <div class="text-4xl mb-2">🎰</div>
+                            <h3 class="text-xl font-bold text-white mb-2">{{ game.name }}</h3>
+                            <p class="text-sm text-gray-400 mb-4">{{ game.type|title }} Game</p>
+                        </div>
+                        
+                        <div class="space-y-2 mb-6 text-sm">
+                            <div class="flex justify-between text-gray-300">
+                                <span>Min Bet:</span>
+                                <span class="text-cyan-400">${{ game.minBet|number_format(2) }}</span>
+                            </div>
+                            <div class="flex justify-between text-gray-300">
+                                <span>Max Bet:</span>
+                                <span class="text-cyan-400">${{ game.maxBet|number_format(2) }}</span>
+                            </div>
+                            {% if game.rtp %}
+                                <div class="flex justify-between text-gray-300">
+                                    <span>RTP:</span>
+                                    <span class="text-green-400">{{ (game.rtp * 100)|number_format(1) }}%</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="space-y-2">
+                            {% if app.user %}
+                                <a href="#" class="play-btn w-full text-center block">
+                                    🎮 Play Now
+                                </a>
+                            {% else %}
+                                <a href="{{ path('app_login') }}" class="play-btn w-full text-center block">
+                                    🔐 Login to Play
+                                </a>
+                            {% endif %}
+                            <a href="{{ path('app_game_details', {slug: game.slug}) }}" class="details-btn w-full text-center block">
+                                📋 View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-12">
+            <div class="text-6xl mb-4">🎰</div>
+            <h2 class="text-2xl font-bold text-white mb-4">No Games Available</h2>
+            <p class="text-gray-400">Check back later for exciting slot games!</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

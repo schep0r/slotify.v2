@@ -6,30 +6,28 @@ namespace App\Validators;
 
 use App\Contracts\BetValidatorInterface;
 use App\Entity\Game;
-use App\Entity\User;
 use App\Exceptions\InsufficientBalanceException;
 use App\Exceptions\InvalidBetException;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class BetValidator implements BetValidatorInterface
 {
-    public function validate(Game $game, User $user, float $betAmount): void
+    public function validate(Game $game, UserInterface $user, float $betAmount): void
     {
         $this->validateBet($betAmount, $game);
-        // Balance validation is now handled by BalanceCheckMiddleware
+        $this->validateBalance($user, $betAmount);
     }
 
     public function validateBet(float $betAmount, Game $game): void
     {
-        if ($betAmount < $game->min_bet || $betAmount > $game->max_bet) {
-            throw new InvalidBetException("Bet must be between {$game->min_bet} and {$game->max_bet}");
+        if ($betAmount < $game->getMinBet() || $betAmount > $game->getMaxBet()) {
+            throw new InvalidBetException("Bet must be between {$game->getMinBet()} and {$game->getMaxBet()}");
         }
     }
 
-    public function validateBalance(User $user, float $betAmount): void
+    public function validateBalance(UserInterface $user, float $betAmount): void
     {
-        // This method is deprecated - balance validation is now handled by BalanceCheckMiddleware
-        // Keeping for backward compatibility, but consider removing in future versions
-        if ($user->balance < $betAmount) {
+        if ($user->getBalance() < $betAmount) {
             throw new InsufficientBalanceException('Insufficient balance for this bet');
         }
     }

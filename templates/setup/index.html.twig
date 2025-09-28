@@ -1,0 +1,126 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Database Setup - {{ parent() }}{% endblock %}
+
+{% block body %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-white mb-4">🔧 Database Setup</h1>
+            <p class="text-xl text-gray-400">Initialize your Slotify database</p>
+        </div>
+
+        {% if database_connected %}
+            <div class="bg-green-800 border border-green-600 rounded-lg p-6 mb-6">
+                <h2 class="text-xl font-bold text-green-100 mb-2">✅ Database Connected</h2>
+                <p class="text-green-200">Successfully connected to the database.</p>
+            </div>
+
+            <div class="bg-gray-800 rounded-lg p-6 mb-6">
+                <h3 class="text-lg font-bold text-white mb-4">Database Status</h3>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-300">User table exists:</span>
+                        <span class="{% if has_user_table %}text-green-400{% else %}text-red-400{% endif %}">
+                            {% if has_user_table %}✅ Yes{% else %}❌ No{% endif %}
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-300">Game table exists:</span>
+                        <span class="{% if has_game_table %}text-green-400{% else %}text-red-400{% endif %}">
+                            {% if has_game_table %}✅ Yes{% else %}❌ No{% endif %}
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-300">Total tables:</span>
+                        <span class="text-cyan-400">{{ tables|length }}</span>
+                    </div>
+                </div>
+            </div>
+
+            {% if not has_user_table or not has_game_table %}
+                <div class="bg-yellow-800 border border-yellow-600 rounded-lg p-6 mb-6">
+                    <h3 class="text-lg font-bold text-yellow-100 mb-2">⚠️ Setup Required</h3>
+                    <p class="text-yellow-200 mb-4">Your database needs to be initialized. Run the following commands:</p>
+                    <div class="bg-gray-900 rounded p-4 font-mono text-sm text-gray-300">
+                        <div class="mb-2"># Create/update database schema</div>
+                        <div class="text-cyan-400">php bin/console doctrine:migrations:migrate</div>
+                        <div class="mt-3 mb-2"># Clear cache (optional)</div>
+                        <div class="text-cyan-400">php bin/console cache:clear</div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="bg-green-800 border border-green-600 rounded-lg p-6 mb-6">
+                    <h3 class="text-lg font-bold text-green-100 mb-2">🎉 Setup Complete!</h3>
+                    <p class="text-green-200">Your database is properly initialized and ready to use.</p>
+                </div>
+            {% endif %}
+
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="text-lg font-bold text-white mb-4">Next Steps</h3>
+                <div class="space-y-3">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-2xl">👤</span>
+                        <div>
+                            <div class="text-white font-semibold">Create an Account</div>
+                            <div class="text-gray-400 text-sm">Register to get a $100 welcome bonus</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="text-2xl">🎰</span>
+                        <div>
+                            <div class="text-white font-semibold">Explore Games</div>
+                            <div class="text-gray-400 text-sm">Check out our collection of slot games</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="text-2xl">💰</span>
+                        <div>
+                            <div class="text-white font-semibold">Make Deposits</div>
+                            <div class="text-gray-400 text-sm">Add funds to start playing</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 text-center">
+                    <a href="{{ path('app_home') }}" class="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200">
+                        🏠 Go to Homepage
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <div class="bg-red-800 border border-red-600 rounded-lg p-6 mb-6">
+                <h2 class="text-xl font-bold text-red-100 mb-2">❌ Database Connection Failed</h2>
+                <p class="text-red-200 mb-4">Could not connect to the database. Please check your configuration.</p>
+                <div class="bg-gray-900 rounded p-4 font-mono text-sm text-red-300">
+                    {{ error }}
+                </div>
+            </div>
+
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="text-lg font-bold text-white mb-4">Troubleshooting</h3>
+                <div class="space-y-4 text-gray-300">
+                    <div>
+                        <div class="font-semibold text-white">1. Check Docker Services</div>
+                        <div class="text-sm">Make sure your database container is running:</div>
+                        <div class="bg-gray-900 rounded p-2 mt-2 font-mono text-sm text-cyan-400">
+                            docker-compose up -d
+                        </div>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-white">2. Verify Database Configuration</div>
+                        <div class="text-sm">Check your .env file for correct database settings</div>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-white">3. Run Migrations</div>
+                        <div class="text-sm">Once connected, initialize the database schema:</div>
+                        <div class="bg-gray-900 rounded p-2 mt-2 font-mono text-sm text-cyan-400">
+                            php bin/console doctrine:migrations:migrate
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

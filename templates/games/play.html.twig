@@ -1,0 +1,345 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Play {{ game.name }} - {{ parent() }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .slot-machine {
+            @apply bg-gradient-to-b from-purple-600 to-purple-800 rounded-xl p-6 shadow-2xl border-4 border-purple-500;
+        }
+        .reels-container {
+            background-color: #111827;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 4px solid #4b5563;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+        }
+        .reels-grid {
+            display: grid;
+            gap: clamp(0.5rem, 2vw, 1rem);
+            grid-template-columns: repeat(var(--reels-count), minmax(0, 1fr));
+            max-width: 100%;
+            margin: 0 auto;
+            justify-content: center;
+        }
+
+        /* Responsive adjustments for different reel counts */
+        @media (max-width: 768px) {
+            .reels-grid {
+                gap: 0.25rem;
+            }
+        }
+
+        /* For 5+ reels, make them slightly smaller */
+        .reels-grid[style*="--reels-count: 5"],
+        .reels-grid[style*="--reels-count: 6"] {
+            max-width: 90%;
+        }
+        .reel-column {
+            background: linear-gradient(to bottom, #374151, #1f2937);
+            border-radius: 0.75rem;
+            padding: clamp(0.5rem, 1.5vw, 0.75rem);
+            border: 4px solid #6b7280;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.25rem, 1vw, 0.5rem);
+            min-width: 0; /* Allows flex items to shrink below content size */
+        }
+        .symbol {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(to bottom right, #4b5563, #374151);
+            border: 3px solid #9ca3af;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            aspect-ratio: 1;
+            font-size: clamp(1rem, 3vw, 2.5rem);
+            min-height: clamp(2.5rem, 8vw, 4rem);
+            border-style: solid;
+            width: 100%;
+        }
+        .symbol.winning {
+            background: linear-gradient(to bottom right, #fde047, #eab308) !important;
+            color: black !important;
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            border-color: #ca8a04 !important;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+        }
+        .controls {
+            @apply bg-gradient-to-b from-gray-800 to-gray-900 rounded-xl p-6 space-y-6 border-4 border-gray-600 shadow-xl;
+        }
+
+        /* Bet Settings Block */
+        .bet-settings-block {
+            @apply bg-gradient-to-br from-purple-700 to-purple-800 rounded-xl p-5 border-4 border-purple-500 shadow-lg;
+        }
+        .bet-settings-title {
+            @apply text-white font-bold text-lg mb-4 text-center border-b-2 border-purple-400 pb-2;
+        }
+
+        /* Bet Amount Section */
+        .bet-amount-section {
+            @apply bg-gray-700 rounded-lg p-4 mb-4 border-2 border-gray-500;
+        }
+        .bet-amount-label {
+            @apply text-purple-200 font-semibold mb-2 block;
+        }
+        .bet-input {
+            @apply bg-gray-600 text-white border-2 border-gray-400 rounded-lg px-4 py-3 w-full focus:ring-4 focus:ring-purple-400 focus:border-purple-300 text-lg font-bold text-center;
+        }
+
+        /* Quick Bet Buttons */
+        .quick-bet-section {
+            @apply mb-4;
+        }
+        .quick-bet-buttons {
+            @apply grid grid-cols-3 gap-3;
+        }
+        .quick-bet {
+            @apply bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-sm font-semibold py-2 px-3 rounded-lg transition-all duration-200 transform hover:scale-105 border-2 border-blue-500;
+        }
+
+        /* Bet Adjustment Buttons */
+        .bet-adjustment-section {
+            @apply mb-4;
+        }
+        .bet-buttons {
+            @apply flex gap-3;
+        }
+        .bet-button {
+            @apply bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 flex-1 border-2 border-purple-500;
+        }
+        .bet-button:disabled {
+            @apply bg-gray-500 cursor-not-allowed transform-none border-gray-400;
+        }
+
+        /* Game Options Section */
+        .game-options-section {
+            @apply bg-gray-700 rounded-lg p-4 space-y-3 border-2 border-gray-500;
+        }
+        .game-options-title {
+            @apply text-gray-200 font-semibold text-sm mb-2;
+        }
+
+        /* Spin Button - Made Bigger */
+        .spin-button {
+            @apply bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-6 px-10 rounded-xl text-2xl transition-all duration-300 transform hover:scale-110 w-full border-4 border-green-400 shadow-2xl;
+            min-height: 80px;
+        }
+        .spin-button:disabled {
+            @apply bg-gray-500 cursor-not-allowed transform-none border-gray-400;
+        }
+        .spin-button:hover:not(:disabled) {
+            box-shadow: 0 0 30px rgba(34, 197, 94, 0.5);
+        }
+
+        .result-display {
+            @apply bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl p-6 text-center font-bold text-xl border-4 border-green-400 shadow-lg;
+        }
+        .balance-display {
+            @apply bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl p-6 text-center border-4 border-blue-400 shadow-lg;
+        }
+        .game-info {
+            @apply bg-gray-800 rounded-xl p-4 text-sm text-gray-300 border-2 border-gray-600;
+        }
+
+        /* Bet Range Info */
+        .bet-range-info {
+            @apply text-xs text-purple-200 text-center bg-purple-800 rounded-lg p-2 border border-purple-600;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container mx-auto px-4 py-8" data-controller="spin" data-spin-url-value="{{ path('app_game_spin', {'slug': game.slug}) }}">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-white">{{ game.name }}</h1>
+                <p class="text-gray-400">{{ game.type|title }} Slot Machine</p>
+            </div>
+            <a href="{{ path('app_game_details', {'slug': game.slug}) }}" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
+                ← Back to Details
+            </a>
+        </div>
+
+        <!-- Slot Machine - Full Width -->
+        <div class="mb-8">
+            <div class="slot-machine">
+                <!-- Reels -->
+                <div class="reels-container">
+                    <div class="reels-grid" style="--reels-count: {{ game.reels|length }};" data-spin-target="reels">
+                        {% for reelIndex, reel in reelsScreen %}
+                            <div class="reel-column">
+                                {% for symbol in reel %}
+                                    <div class="symbol {% if winningPositions is defined and winningPositions[reelIndex] is defined and loop.index0 in winningPositions[reelIndex] %}winning{% endif %}">
+                                        {{ symbol }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Win Display -->
+                <div data-spin-target="winDisplay" class="{% if not (lastResult is defined and lastResult.totalWin > 0) %}hidden{% endif %}">
+                {% if lastResult is defined and lastResult.totalWin > 0 %}
+                    <div class="result-display">
+                        <div class="text-2xl">🎉 WIN! 🎉</div>
+                        <div class="text-3xl font-bold">${{ lastResult.totalWin|number_format(2) }}</div>
+                        {% if lastResult.winLines is defined and lastResult.winLines|length > 0 %}
+                            <div class="text-sm mt-2">
+                                {{ lastResult.winLines|length }} winning line{{ lastResult.winLines|length > 1 ? 's' : '' }}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Info Bar -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+            <!-- Balance -->
+            <div class="balance-display">
+                <div class="text-blue-200 text-sm">Your Balance</div>
+                <div class="text-2xl font-bold text-white" data-spin-target="balance">${{ user.balance|number_format(2) }}</div>
+            </div>
+
+            <!-- Last Spin Results -->
+            <div data-spin-target="lastResult">
+            {% if lastResult is defined %}
+                <div class="bg-gray-800 rounded-xl p-4 border-2 border-gray-600">
+                    <h4 class="text-white font-bold mb-2">Last Spin</h4>
+                    <div class="text-sm text-gray-300 space-y-1">
+                        <div>Bet: ${{ lastResult.betAmount|number_format(2) }}</div>
+                        <div>Win: ${{ lastResult.totalWin|number_format(2) }}</div>
+                        {% if lastResult.totalWin > 0 %}
+                            <div class="text-green-400">
+                                Profit: ${{ (lastResult.totalWin - lastResult.betAmount)|number_format(2) }}
+                            </div>
+                        {% else %}
+                            <div class="text-red-400">
+                                Loss: -${{ lastResult.betAmount|number_format(2) }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+            </div>
+
+            <!-- Quick Spin Button -->
+            <div class="flex items-center">
+                {{ form_start(spinForm, {'action': path('app_game_play', {'slug': game.slug}), 'attr': {'data-spin-target': 'form'}}) }}
+                <button type="button" class="spin-button w-full" data-action="click->spin#onSpin" data-spin-target="spinButton">
+                    🎰 SPIN! 🎰
+                </button>
+            </div>
+        </div>
+
+        <!-- Bet Settings Block - Bottom of Page -->
+        <div class="bet-settings-block">
+            <div class="bet-settings-title">🎯 Bet Settings & Game Options</div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Left Column: Bet Controls -->
+                <div class="space-y-4">
+                    <!-- Bet Amount Section -->
+                    <div class="bet-amount-section">
+                        <label class="bet-amount-label">💰 Bet Amount</label>
+                        {{ form_widget(spinForm.betAmount, {'attr': {'class': 'bet-input'}}) }}
+                    </div>
+
+                    <!-- Quick Bet Buttons -->
+                    <div class="quick-bet-section">
+                        <div class="text-purple-200 text-sm font-semibold mb-2">Quick Bets:</div>
+                        <div class="quick-bet-buttons">
+                            <button type="button" class="quick-bet" onclick="setBet({{ game.minBet }})">
+                                Min<br>${{ game.minBet|number_format(2) }}
+                            </button>
+                            <button type="button" class="quick-bet" onclick="setBet({{ (game.minBet + game.maxBet) / 2 }})">
+                                Mid<br>${{ ((game.minBet + game.maxBet) / 2)|number_format(2) }}
+                            </button>
+                            <button type="button" class="quick-bet" onclick="setBet({{ game.maxBet }})">
+                                Max<br>${{ game.maxBet|number_format(2) }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Bet Adjustment Buttons -->
+                    <div class="bet-adjustment-section">
+                        <div class="text-purple-200 text-sm font-semibold mb-2">Adjust Bet:</div>
+                        <div class="bet-buttons">
+                            <button type="button" class="bet-button" onclick="adjustBet(-{{ game.stepBet }})">
+                                ➖ ${{ game.stepBet|number_format(2) }}
+                            </button>
+                            <button type="button" class="bet-button" onclick="adjustBet({{ game.stepBet }})">
+                                ➕ ${{ game.stepBet|number_format(2) }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Game Options -->
+                <div class="space-y-4">
+                    <!-- Game Options Section -->
+                    <div class="game-options-section">
+                        <div class="game-options-title">⚙️ Game Options</div>
+                        {{ form_row(spinForm.activePaylines, {'attr': {'class': 'bg-gray-600 text-white border-2 border-gray-400 rounded-lg px-3 py-2'}}) }}
+                        {{ form_row(spinForm.useFreeSpins, {'attr': {'class': 'mr-2'}}) }}
+                    </div>
+
+                    <!-- Bet Range Info -->
+                    <div class="bet-range-info">
+                        📊 Range: ${{ game.minBet|number_format(2) }} - ${{ game.maxBet|number_format(2) }} | Step: ${{ game.stepBet|number_format(2) }}
+                    </div>
+
+                    {% if user.balance < (currentBet ?? game.minBet) %}
+                        <div class="bg-red-600 text-white text-sm text-center p-3 rounded-lg border-2 border-red-400">
+                            ⚠️ Insufficient balance to place this bet
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {{ form_end(spinForm) }}
+    </div>
+</div>
+
+<script>
+    function setBet(amount) {
+        const input = document.getElementById('spin_betAmount');
+        const min = parseFloat(input.min);
+        const max = parseFloat(input.max);
+
+        if (amount >= min && amount <= max) {
+            input.value = amount.toFixed(2);
+        }
+    }
+
+    function adjustBet(adjustment) {
+        const input = document.getElementById('spin_betAmount');
+        const current = parseFloat(input.value) || parseFloat(input.min);
+        const min = parseFloat(input.min);
+        const max = parseFloat(input.max);
+        const step = parseFloat(input.step);
+
+        let newAmount = current + adjustment;
+
+        // Round to step precision
+        newAmount = Math.round(newAmount / step) * step;
+
+        // Clamp to min/max
+        newAmount = Math.max(min, Math.min(max, newAmount));
+
+        input.value = newAmount.toFixed(2);
+    }
+</script>
+{% endblock %}

@@ -11,10 +11,10 @@ use App\Contracts\SpinStrategyInterface;
 use App\DTOs\GameResultDto;
 use App\DTOs\SlotGameDataDto;
 use App\Entity\Game;
-use App\Entity\User;
 use App\Exceptions\InsufficientFreeSpinsException;
 use App\Managers\FreeSpinManager;
 use App\Managers\GameSessionManager;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Strategy for handling free spins.
@@ -30,12 +30,12 @@ class FreeSpinStrategy implements SpinStrategyInterface
     ) {
     }
 
-    public function execute(User $user, Game $game, array $gameData): GameResultDto
+    public function execute(UserInterface $user, Game $game, array $gameData): GameResultDto
     {
         $activePaylines = $gameData['activePaylines'] ?? [0];
 
         // Step 1: Check if user has available free spins
-        $availableFreeSpins = $this->freeSpinManager->getAvailableFreeSpins($user, $game->id);
+        $availableFreeSpins = $this->freeSpinManager->getAvailableFreeSpins($user, $game->getId());
 
         if ($availableFreeSpins <= 0) {
             throw new InsufficientFreeSpinsException('No free spins available for this game');
@@ -49,8 +49,8 @@ class FreeSpinStrategy implements SpinStrategyInterface
         $visibleSymbols = $spinResult->symbols;
 
         // Step 4: Get the free spin bet value (from the free spin record)
-        $freeSpinRecord = $this->freeSpinManager->getUserFreeSpins($user, $game->id)->first();
-        $betAmount = $freeSpinRecord->bet_value ?? $game->min_bet;
+        $freeSpinRecord = $this->freeSpinManager->getUserFreeSpins($user, $game->getId())->first();
+        $betAmount = $freeSpinRecord->bet_value ?? $game->getMinBet();
 
         // Step 5: Calculate payouts (no bet deduction for free spins)
         $payoutResult = $this->payoutCalculator->calculatePayout(
@@ -63,7 +63,7 @@ class FreeSpinStrategy implements SpinStrategyInterface
         // Step 6: Use the free spin and process winnings
         $freeSpinTransaction = $this->freeSpinManager->useFreeSpin(
             $user,
-            $game->id,
+            $game->getId(),
             [
                 'reelPositions' => $spinResult->positions,
                 'visibleSymbols' => $visibleSymbols,
@@ -73,8 +73,7 @@ class FreeSpinStrategy implements SpinStrategyInterface
         );
 
         // Step 7: Get updated balance (already updated by FreeSpinManager)
-        $user->refresh();
-        $newBalance = $user->balance;
+        $newBalance = $user->getBalance();
 
         // Step 8: Log game round
         $this->gameLogger->logGameRound($gameSession, $payoutResult, $betAmount, $visibleSymbols);

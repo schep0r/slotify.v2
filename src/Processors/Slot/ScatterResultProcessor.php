@@ -23,17 +23,17 @@ class ScatterResultProcessor
         $scatterCounts = [];
         $scatterPositions = [];
 
-        foreach ($game->scatterConfigurations as $scatterConfigurationRecord) {
-            $scatterConfiguration = $scatterConfigurationRecord->value;
-            $scatterCount = $this->countScatterSymbols($visibleSymbols, $scatterConfiguration[self::KEY_SYMBOL]);
-            $scatterPositions = $this->getScatterPositions($visibleSymbols, $scatterConfiguration[self::KEY_SYMBOL]);
+        // Default scatter symbol (star)
+        $scatterSymbol = '⭐';
+        
+        $scatterCount = $this->countScatterSymbols($visibleSymbols, $scatterSymbol);
+        $positions = $this->getScatterPositions($visibleSymbols, $scatterSymbol);
 
-            if (isset($scatterConfiguration['pays_independently'])) {
-                $payout += $betAmount * ($scatterConfiguration['paytable'][$scatterCount] ?? 0);
-            }
-
+        if ($scatterCount >= 3) {
+            $payout = $this->calculateScatterPayout($scatterCount, $betAmount);
+            $freeSpins = $this->calculateFreeSpins($scatterCount);
             $scatterCounts[] = $scatterCount;
-            $scatterPositions[] = $scatterPositions;
+            $scatterPositions[] = $positions;
         }
 
         return [
@@ -41,7 +41,7 @@ class ScatterResultProcessor
             'freeSpins' => $freeSpins,
             'scatterCount' => $scatterCounts,
             'positions' => $scatterPositions,
-            'isScatterWin' => count($scatterCounts) > 0,
+            'isScatterWin' => $scatterCount >= 3,
         ];
     }
 

@@ -25,10 +25,14 @@
                     </div>
                     <div class="flex items-center space-x-4">
                         {% if app.user %}
+                            <a href="{{ path('app_games') }}" class="text-gray-300 hover:text-white transition-colors">Games</a>
+                            <a href="{{ path('app_transactions') }}" class="text-gray-300 hover:text-white transition-colors">History</a>
                             <span class="text-gray-300">Welcome, {{ app.user.email }}</span>
-                            <span class="text-cyan-400 font-semibold">${{ app.user.balance|number_format(2) }}</span>
+                            <a href="{{ path('app_deposit') }}" class="text-cyan-400 font-semibold hover:text-cyan-300 transition-colors">${{ app.user.balance|number_format(2) }}</a>
+                            <a href="{{ path('app_deposit') }}" class="btn-primary">Deposit</a>
                             <a href="{{ path('app_logout') }}" class="text-gray-300 hover:text-white transition-colors">Logout</a>
                         {% else %}
+                            <a href="{{ path('app_games') }}" class="text-gray-300 hover:text-white transition-colors">Games</a>
                             <a href="{{ path('app_login') }}" class="text-gray-300 hover:text-white transition-colors">Sign In</a>
                             <a href="{{ path('app_register') }}" class="btn-primary">Sign Up</a>
                         {% endif %}

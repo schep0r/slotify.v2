@@ -6,6 +6,7 @@ use App\Repository\GameSessionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: GameSessionRepository::class)]
 class GameSession
@@ -50,9 +51,16 @@ class GameSession
     #[ORM\OneToMany(targetEntity: Transaction::class, mappedBy: 'gameSession')]
     private Collection $transactions;
 
+    /**
+     * @var Collection<int, GameRound>
+     */
+    #[ORM\OneToMany(targetEntity: GameRound::class, mappedBy: 'gameSession')]
+    private Collection $gameRounds;
+
     public function __construct()
     {
         $this->transactions = new ArrayCollection();
+        $this->gameRounds = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -65,7 +73,7 @@ class GameSession
         return $this->player;
     }
 
-    public function setPlayer(?User $player): static
+    public function setPlayer(?UserInterface $player): static
     {
         $this->player = $player;
 
@@ -192,6 +200,36 @@ class GameSession
             // set the owning side to null (unless already changed)
             if ($transaction->getGameSession() === $this) {
                 $transaction->setGameSession(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, GameRound>
+     */
+    public function getGameRounds(): Collection
+    {
+        return $this->gameRounds;
+    }
+
+    public function addGameRound(GameRound $gameRound): static
+    {
+        if (!$this->gameRounds->contains($gameRound)) {
+            $this->gameRounds->add($gameRound);
+            $gameRound->setGameSession($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGameRound(GameRound $gameRound): static
+    {
+        if ($this->gameRounds->removeElement($gameRound)) {
+            // set the owning side to null (unless already changed)
+            if ($gameRound->getGameSession() === $this) {
+                $gameRound->setGameSession(null);
             }
         }
 

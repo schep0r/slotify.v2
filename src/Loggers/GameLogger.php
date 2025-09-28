@@ -17,19 +17,8 @@ class GameLogger implements GameLoggerInterface
 
     public function logGameRound(
         GameSession $gameSession,
-        array $spinData,
-        float $betAmount,
-        array $visibleSymbols,
+        array $spinData
     ): void {
-        $spinData = array_merge(
-            $spinData,
-            [
-                'bet_amount' => $betAmount,
-                'win_amount' => $spinData['totalPayout'],
-                'reel_result' => $visibleSymbols,
-            ]
-        );
-
         $this->gameRoundManager->processSpin($gameSession, $spinData);
     }
 }

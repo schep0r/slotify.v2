@@ -11,6 +11,7 @@ use App\Entity\Game;
 use App\Entity\User;
 use App\Strategies\BetSpinStrategy;
 use App\Strategies\FreeSpinStrategy;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * SlotGameEngine - Orchestrates slot game flow using Strategy pattern.
@@ -37,7 +38,7 @@ class SlotGameEngine implements GameEngineInterface
     /**
      * Execute a spin using the appropriate strategy.
      */
-    public function play(User $user, Game $game, array $gameData): GameResultDto
+    public function play(UserInterface $user, Game $game, array $gameData): GameResultDto
     {
         $strategy = $this->getStrategy($gameData);
 
@@ -61,7 +62,7 @@ class SlotGameEngine implements GameEngineInterface
     public function validateInput(array $gameData, Game $game, User $user): void
     {
         $activePaylines = $gameData['activePaylines'] ?? [0];
-        $maxPaylines = count($game->paylinesConfiguration->value ?? []);
+        $maxPaylines = count($game->getPaylines() ?? []);
 
         foreach ($activePaylines as $payline) {
             if ($payline >= $maxPaylines) {

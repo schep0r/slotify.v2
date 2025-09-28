@@ -1,0 +1,160 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ game.name }} - Game Details - {{ parent() }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .game-detail-card {
+            @apply bg-gray-800 rounded-lg shadow-xl p-8;
+        }
+        .stat-card {
+            @apply bg-gray-700 rounded-lg p-4 text-center;
+        }
+        .play-btn {
+            @apply bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-200 text-lg;
+        }
+        .back-btn {
+            @apply bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200;
+        }
+        .paytable-row {
+            @apply border-b border-gray-600 py-2;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Back Button -->
+        <div class="mb-6">
+            <a href="{{ path('app_games') }}" class="back-btn">
+                ← Back to Games
+            </a>
+        </div>
+
+        <div class="game-detail-card">
+            <!-- Game Header -->
+            <div class="text-center mb-8">
+                <div class="text-6xl mb-4">🎰</div>
+                <h1 class="text-4xl font-bold text-white mb-2">{{ game.name }}</h1>
+                <p class="text-xl text-gray-400">{{ game.type|title }} Slot Game</p>
+                {% if app.user %}
+                    <div class="mt-4 p-4 bg-gray-700 rounded-lg inline-block">
+                        <p class="text-sm text-gray-300">Your Balance:</p>
+                        <p class="text-2xl font-bold text-cyan-400">${{ app.user.balance|number_format(2) }}</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Game Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                <div class="stat-card">
+                    <div class="text-2xl font-bold text-cyan-400">${{ game.minBet|number_format(2) }}</div>
+                    <div class="text-sm text-gray-400">Min Bet</div>
+                </div>
+                <div class="stat-card">
+                    <div class="text-2xl font-bold text-cyan-400">${{ game.maxBet|number_format(2) }}</div>
+                    <div class="text-sm text-gray-400">Max Bet</div>
+                </div>
+                <div class="stat-card">
+                    <div class="text-2xl font-bold text-cyan-400">${{ game.stepBet|number_format(2) }}</div>
+                    <div class="text-sm text-gray-400">Bet Step</div>
+                </div>
+                {% if game.rtp %}
+                    <div class="stat-card">
+                        <div class="text-2xl font-bold text-green-400">{{ (game.rtp * 100)|number_format(1) }}%</div>
+                        <div class="text-sm text-gray-400">RTP</div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Game Configuration -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- Game Info -->
+                <div>
+                    <h3 class="text-xl font-bold text-white mb-4">🎮 Game Information</h3>
+                    <div class="bg-gray-700 rounded-lg p-4 space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-300">Game Type:</span>
+                            <span class="text-white">{{ game.type|title }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-300">Reels:</span>
+{#                            <span class="text-white">{{ game.reels|length ?? 'N/A' }}</span>#}
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-300">Rows:</span>
+                            <span class="text-white">{{ game.rows ?? 'N/A' }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-300">Paylines:</span>
+{#                            <span class="text-white">{{ game.paylines|length ?? 'N/A' }}</span>#}
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-300">Status:</span>
+                            <span class="text-green-400">{{ game.isActive ? 'Active' : 'Inactive' }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paytable Preview -->
+                {% if game.paytable|length > 0 %}
+                    <div>
+                        <h3 class="text-xl font-bold text-white mb-4">💰 Paytable (Preview)</h3>
+                        <div class="bg-gray-700 rounded-lg p-4 max-h-64 overflow-y-auto">
+                            {% for symbol, payouts in game.paytable|slice(0, 5) %}
+                                <div class="paytable-row flex justify-between">
+                                    <span class="text-gray-300">{{ symbol }}</span>
+                                    <span class="text-cyan-400">
+                                        {% if payouts is iterable %}
+                                            {{ payouts|join(', ') }}x
+                                        {% else %}
+                                            {{ payouts }}x
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            {% endfor %}
+                            {% if game.paytable|length > 5 %}
+                                <div class="text-center text-gray-400 text-sm mt-2">
+                                    ... and {{ game.paytable|length - 5 }} more symbols
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Play Button -->
+            <div class="text-center">
+                {% if app.user %}
+                    {% if app.user.balance >= game.minBet %}
+                        <a href="{{ path('app_game_play', {'slug': game.slug}) }}" class="play-btn">
+                            🎮 Play {{ game.name }}
+                        </a>
+                        <p class="text-sm text-gray-400 mt-2">
+                            Ready to play! Minimum bet: ${{ game.minBet|number_format(2) }}
+                        </p>
+                    {% else %}
+                        <div class="text-center">
+                            <p class="text-red-400 mb-4">
+                                Insufficient balance. You need at least ${{ game.minBet|number_format(2) }} to play.
+                            </p>
+                            <a href="{{ path('app_deposit') }}" class="play-btn">
+                                💰 Make a Deposit
+                            </a>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <a href="{{ path('app_login') }}" class="play-btn">
+                        🔐 Login to Play
+                    </a>
+                    <p class="text-sm text-gray-400 mt-2">
+                        Create an account to start playing and get a $100 welcome bonus!
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

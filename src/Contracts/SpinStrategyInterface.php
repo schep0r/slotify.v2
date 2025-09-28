@@ -6,7 +6,7 @@ namespace App\Contracts;
 
 use App\DTOs\GameResultDto;
 use App\Entity\Game;
-use App\Entity\User;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Strategy interface for different types of spins (bet spins vs free spins).
@@ -16,7 +16,7 @@ interface SpinStrategyInterface
     /**
      * Execute the spin strategy.
      */
-    public function execute(User $user, Game $game, array $gameData): GameResultDto;
+    public function execute(UserInterface $user, Game $game, array $gameData): GameResultDto;
 
     /**
      * Validate if this strategy can handle the given game data.

@@ -9,6 +9,7 @@ use App\Entity\GameSession;
 use App\Entity\Transaction;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class TransactionManager implements TransactionManagerInterface
 {
@@ -17,7 +18,7 @@ class TransactionManager implements TransactionManagerInterface
     }
 
     public function processSpinTransaction(
-        User $user,
+        UserInterface $user,
         GameSession $gameSession,
         float $betAmount,
         array $payoutResult,
@@ -52,7 +53,7 @@ class TransactionManager implements TransactionManagerInterface
     }
 
     public function processGameTransaction(
-        User $user,
+        UserInterface $user,
         GameSession $gameSession,
         float $betAmount,
         float $winAmount,
@@ -89,7 +90,7 @@ class TransactionManager implements TransactionManagerInterface
     }
 
     private function createBetTransaction(
-        User $user,
+        UserInterface $user,
         GameSession $gameSession,
         float $amount,
         float $balanceBefore,
@@ -115,7 +116,7 @@ class TransactionManager implements TransactionManagerInterface
     }
 
     private function createWinTransaction(
-        User $user,
+        UserInterface $user,
         GameSession $gameSession,
         float $amount,
         float $balanceBefore,

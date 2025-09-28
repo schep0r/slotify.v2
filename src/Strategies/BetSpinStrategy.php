@@ -15,6 +15,7 @@ use App\DTOs\SlotGameDataDto;
 use App\Entity\Game;
 use App\Entity\User;
 use App\Managers\GameSessionManager;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Strategy for handling regular bet spins.
@@ -31,13 +32,19 @@ class BetSpinStrategy implements SpinStrategyInterface
     ) {
     }
 
-    public function execute(User $user, Game $game, array $gameData): GameResultDto
+    public function execute(UserInterface $user, Game $game, array $gameData): GameResultDto
     {
         $betAmount = $gameData['betAmount'];
         $activePaylines = $gameData['activePaylines'] ?? [0];
 
         // Step 1: Validate bet and user
         $this->betValidator->validate($game, $user, $betAmount);
+
+        $spinData = [
+            'bet_amount' => $gameData['betAmount'],
+            'bet_per_line' => $gameData['betAmount'] / count($gameData['activePaylines']),
+            'balance_before' => $user->getBalance(),
+        ];
 
         // Step 2: Get or create game session
         $gameSession = $this->gameSessionManager->getOrCreateUserSession($user, $game);
@@ -62,6 +69,11 @@ class BetSpinStrategy implements SpinStrategyInterface
             $payoutResult['totalPayout']
         );
 
+        $spinData['win_amount'] = $payoutResult['totalPayout'];
+        $spinData['paylines_won'] = $payoutResult['winningLines'];
+        $spinData['balance_after'] = $newBalance;
+        $spinData['reel_result'] = $visibleSymbols;
+
         // TODO: think about how to split this flow, to use queues to reduce load
 
         // Step 6.1: Update Game session data
@@ -71,7 +83,7 @@ class BetSpinStrategy implements SpinStrategyInterface
             ->setTotalWin($gameSession->getTotalWin() + $payoutResult['totalPayout']);
 
         // Step 6.2: Log game round
-        $this->gameLogger->logGameRound($gameSession, $payoutResult, $betAmount, $visibleSymbols);
+        $this->gameLogger->logGameRound($gameSession, $spinData);
 
         // Step 7: Return game result
         return $this->buildGameResult($spinResult->positions, $visibleSymbols, $payoutResult, $newBalance);

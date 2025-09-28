@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\TransactionRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: TransactionRepository::class)]
 class Transaction
@@ -37,7 +38,7 @@ class Transaction
     private ?User $player = null;
 
     #[ORM\ManyToOne(inversedBy: 'transactions')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?GameSession $gameSession = null;
 
     #[ORM\Column(length: 64)]
@@ -67,6 +68,12 @@ class Transaction
     #[ORM\Column(length: 64)]
     private ?string $status = null;
 
+    #[ORM\Column(length: 64, nullable: true)]
+    private ?string $paymentMethod = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $createdAt = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -77,7 +84,7 @@ class Transaction
         return $this->player;
     }
 
-    public function setPlayer(?User $player): static
+    public function setPlayer(?UserInterface $player): static
     {
         $this->player = $player;
 
@@ -200,6 +207,30 @@ class Transaction
     public function setStatus(string $status): static
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getPaymentMethod(): ?string
+    {
+        return $this->paymentMethod;
+    }
+
+    public function setPaymentMethod(?string $paymentMethod): static
+    {
+        $this->paymentMethod = $paymentMethod;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
 
         return $this;
     }

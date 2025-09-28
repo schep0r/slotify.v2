@@ -1,0 +1,156 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Make a Deposit - {{ parent() }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .payment-method-card {
+            @apply border-2 border-gray-600 rounded-lg p-4 cursor-pointer transition-all duration-200 hover:border-cyan-400;
+        }
+        .payment-method-card.selected {
+            @apply border-cyan-400 bg-gray-800;
+        }
+        .form-input {
+            @apply w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400;
+        }
+        .btn-primary {
+            @apply bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-gray-900;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-2xl mx-auto">
+        <div class="bg-gray-800 rounded-lg shadow-xl p-8">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-white mb-2">💰 Make a Deposit</h1>
+                <p class="text-gray-400">Add funds to your account to start playing</p>
+                <div class="mt-4 p-4 bg-gray-700 rounded-lg">
+                    <p class="text-sm text-gray-300">Current Balance:</p>
+                    <p class="text-2xl font-bold text-cyan-400">${{ user.balance|number_format(2) }}</p>
+                </div>
+            </div>
+
+            {% for message in app.flashes('success') %}
+                <div class="mb-6 p-4 bg-green-800 border border-green-600 rounded-lg text-green-100">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div class="mb-6 p-4 bg-red-800 border border-red-600 rounded-lg text-red-100">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
+                
+                <div>
+                    {{ form_label(form.amount, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-300 mb-2'}}) }}
+                    {{ form_widget(form.amount) }}
+                    {{ form_errors(form.amount) }}
+                    <p class="mt-1 text-sm text-gray-400">Minimum: $1.00, Maximum: $10,000.00</p>
+                </div>
+
+                <div>
+                    {{ form_label(form.paymentMethod, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-300 mb-4'}}) }}
+                    
+                    <div class="space-y-3">
+                        {% for choice in form.paymentMethod %}
+                            <label class="payment-method-card block">
+                                {{ form_widget(choice, {'attr': {'class': 'sr-only payment-method-radio'}}) }}
+                                <div class="flex items-center space-x-4">
+                                    <div class="text-2xl">
+                                        {% if choice.vars.value == 'card' %}💳
+                                        {% elseif choice.vars.value == 'paypal' %}🅿️
+                                        {% else %}🔧
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex-1">
+                                        <h3 class="text-lg font-semibold text-white">{{ choice.vars.label }}</h3>
+                                        <p class="text-sm text-gray-400">
+                                            {% if choice.vars.value == 'card' %}
+                                                Secure payment with credit or debit card
+                                            {% elseif choice.vars.value == 'paypal' %}
+                                                Pay with your PayPal account
+                                            {% else %}
+                                                Development payment method (always succeeds)
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                    <div class="radio-indicator w-4 h-4 border-2 border-gray-400 rounded-full"></div>
+                                </div>
+                            </label>
+                        {% endfor %}
+                    </div>
+                    {{ form_errors(form.paymentMethod) }}
+                </div>
+
+                <div class="pt-4">
+                    {{ form_widget(form.submit) }}
+                </div>
+
+            {{ form_end(form) }}
+
+            <div class="mt-8 text-center">
+                <a href="{{ path('app_deposit_history') }}" class="text-cyan-400 hover:text-cyan-300 transition-colors">
+                    View Deposit History
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const radioInputs = document.querySelectorAll('input[type="radio"][name*="paymentMethod"]');
+    const cards = document.querySelectorAll('.payment-method-card');
+    
+    function updateSelection() {
+        cards.forEach((card) => {
+            const radio = card.querySelector('input[type="radio"]');
+            const indicator = card.querySelector('.radio-indicator');
+            
+            if (radio && radio.checked) {
+                card.classList.add('selected');
+                if (indicator) {
+                    indicator.classList.add('bg-cyan-400', 'border-cyan-400');
+                    indicator.classList.remove('border-gray-400');
+                }
+            } else {
+                card.classList.remove('selected');
+                if (indicator) {
+                    indicator.classList.remove('bg-cyan-400', 'border-cyan-400');
+                    indicator.classList.add('border-gray-400');
+                }
+            }
+        });
+    }
+    
+    // Add event listeners to radio inputs
+    radioInputs.forEach(radio => {
+        radio.addEventListener('change', updateSelection);
+    });
+    
+    // Add click handlers to cards
+    cards.forEach((card) => {
+        card.addEventListener('click', function(e) {
+            // Prevent double-triggering if clicking directly on radio
+            if (e.target.type === 'radio') return;
+            
+            const radio = card.querySelector('input[type="radio"]');
+            if (radio) {
+                radio.checked = true;
+                // Trigger change event manually
+                radio.dispatchEvent(new Event('change'));
+            }
+        });
+    });
+    
+    // Initial update
+    updateSelection();
+});
+</script>
+{% endblock %}

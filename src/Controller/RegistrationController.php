@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Transaction;
 use App\Form\RegistrationFormType;
 use App\Security\AppLoginAuthenticator;
 use Doctrine\ORM\EntityManagerInterface;
@@ -29,7 +30,8 @@ class RegistrationController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             // Set initial balance for new users
-            $user->setBalance(100.00); // $100 welcome bonus
+            $welcomeBonusAmount = 100.00; // $100 welcome bonus
+            $user->setBalance($welcomeBonusAmount);
             
             // Encode the plain password
             $user->setPassword(
@@ -40,6 +42,27 @@ class RegistrationController extends AbstractController
             );
 
             $entityManager->persist($user);
+            $entityManager->flush();
+
+            // Create welcome bonus transaction record
+            $welcomeTransaction = new Transaction();
+            $welcomeTransaction->setPlayer($user);
+            $welcomeTransaction->setType(Transaction::TYPE_BONUS);
+            $welcomeTransaction->setAmount($welcomeBonusAmount);
+            $welcomeTransaction->setBalanceBefore(0.00);
+            $welcomeTransaction->setBalanceAfter($welcomeBonusAmount);
+            $welcomeTransaction->setReferenceId(uniqid('welcome_', true));
+            $welcomeTransaction->setDescription('Welcome bonus for new player');
+            $welcomeTransaction->setStatus(Transaction::STATUS_COMPLETED);
+            $welcomeTransaction->setPaymentMethod(null);
+            $welcomeTransaction->setCreatedAt(new \DateTimeImmutable());
+            $welcomeTransaction->setGameSession(null);
+            $welcomeTransaction->setMetadata([
+                'bonus_type' => 'welcome',
+                'reason' => 'New player registration'
+            ]);
+
+            $entityManager->persist($welcomeTransaction);
             $entityManager->flush();
 
             // Automatically log in the user after registration
