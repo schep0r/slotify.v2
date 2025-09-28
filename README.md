@@ -39,7 +39,7 @@ A modern, dark-themed casino slot game application built with Symfony 7.3, featu
 
 ## Technology Stack
 
-- **Backend**: Symfony 7.3 with PHP 8.2+
+- **Backend**: Symfony 7.3 with PHP 8.3+
 - **Database**: SQLite (development) / PostgreSQL (production)
 - **Frontend**: Tailwind CSS with custom dark theme
 - **Security**: Symfony Security with custom authenticator
@@ -110,7 +110,7 @@ composer check-coverage
 
 #### GitHub Actions
 The project uses GitHub Actions for continuous integration:
-- Runs on PHP 8.2 with PostgreSQL 15
+- Runs on PHP 8.3 with PostgreSQL 15
 - Executes all tests with coverage reporting
 - Enforces minimum coverage threshold
 - Uploads coverage reports to Codecov
