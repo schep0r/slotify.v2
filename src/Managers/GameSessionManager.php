@@ -6,7 +6,6 @@ namespace App\Managers;
 
 use App\Entity\Game;
 use App\Entity\GameSession;
-use App\Entity\User;
 use App\Repository\GameSessionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;

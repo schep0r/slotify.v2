@@ -25,7 +25,7 @@ class ScatterResultProcessor
 
         // Default scatter symbol (star)
         $scatterSymbol = '⭐';
-        
+
         $scatterCount = $this->countScatterSymbols($visibleSymbols, $scatterSymbol);
         $positions = $this->getScatterPositions($visibleSymbols, $scatterSymbol);
 

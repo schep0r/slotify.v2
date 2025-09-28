@@ -22,7 +22,7 @@ class DepositCommand extends Command
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private DepositService $depositService
+        private DepositService $depositService,
     ) {
         parent::__construct();
     }
@@ -40,7 +40,7 @@ class DepositCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        
+
         $email = $input->getArgument('email');
         $amount = (float) $input->getArgument('amount');
         $methodValue = $input->getOption('method');
@@ -49,11 +49,13 @@ class DepositCommand extends Command
         // Validate amount
         if ($amount <= 0) {
             $io->error('Amount must be greater than 0');
+
             return Command::FAILURE;
         }
 
         if ($amount > 10000) {
             $io->error('Amount cannot exceed $10,000');
+
             return Command::FAILURE;
         }
 
@@ -67,7 +69,8 @@ class DepositCommand extends Command
         }
 
         if (!$paymentMethod) {
-            $io->error(sprintf('Invalid payment method. Available: %s', implode(', ', array_map(fn($m) => $m->value, PaymentMethod::cases()))));
+            $io->error(sprintf('Invalid payment method. Available: %s', implode(', ', array_map(fn ($m) => $m->value, PaymentMethod::cases()))));
+
             return Command::FAILURE;
         }
 
@@ -75,6 +78,7 @@ class DepositCommand extends Command
         $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
         if (!$user) {
             $io->error(sprintf('User with email "%s" not found', $email));
+
             return Command::FAILURE;
         }
 
@@ -84,15 +88,16 @@ class DepositCommand extends Command
             ['Field', 'Value'],
             [
                 ['User', $user->getEmail()],
-                ['Current Balance', '$' . number_format($user->getBalance(), 2)],
-                ['Deposit Amount', '$' . number_format($amount, 2)],
+                ['Current Balance', '$'.number_format($user->getBalance(), 2)],
+                ['Deposit Amount', '$'.number_format($amount, 2)],
                 ['Payment Method', $paymentMethod->getLabel()],
-                ['New Balance', '$' . number_format($user->getBalance() + $amount, 2)],
+                ['New Balance', '$'.number_format($user->getBalance() + $amount, 2)],
             ]
         );
 
         if (!$force && !$io->confirm('Proceed with this deposit?', false)) {
             $io->info('Deposit cancelled');
+
             return Command::SUCCESS;
         }
 
@@ -105,18 +110,21 @@ class DepositCommand extends Command
                     'Deposit processed successfully!',
                     sprintf('Transaction ID: %s', $transaction->getId()),
                     sprintf('Reference ID: %s', $transaction->getReferenceId()),
-                    sprintf('User balance updated: $%.2f → $%.2f', 
-                        $transaction->getBalanceBefore(), 
+                    sprintf('User balance updated: $%.2f → $%.2f',
+                        $transaction->getBalanceBefore(),
                         $transaction->getBalanceAfter()
                     ),
                 ]);
+
                 return Command::SUCCESS;
             } else {
                 $io->error('Deposit processing failed');
+
                 return Command::FAILURE;
             }
         } catch (\Exception $e) {
             $io->error(sprintf('Error processing deposit: %s', $e->getMessage()));
+
             return Command::FAILURE;
         }
     }

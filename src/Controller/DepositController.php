@@ -18,7 +18,7 @@ class DepositController extends AbstractController
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private DepositService $depositService
+        private DepositService $depositService,
     ) {
     }
 
@@ -30,7 +30,7 @@ class DepositController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
-            
+
             // Process the deposit
             $transaction = $this->depositService->processDeposit(
                 $this->getUser(),
@@ -62,8 +62,8 @@ class DepositController extends AbstractController
     public function success(Transaction $transaction): Response
     {
         // Ensure this is a deposit transaction and user can only see their own
-        if ($transaction->getType() !== Transaction::TYPE_DEPOSIT || 
-            $transaction->getPlayer() !== $this->getUser()) {
+        if (Transaction::TYPE_DEPOSIT !== $transaction->getType()
+            || $transaction->getPlayer() !== $this->getUser()) {
             throw $this->createAccessDeniedException();
         }
 
@@ -78,7 +78,7 @@ class DepositController extends AbstractController
         $deposits = $this->entityManager->getRepository(Transaction::class)
             ->findBy([
                 'player' => $this->getUser(),
-                'type' => Transaction::TYPE_DEPOSIT
+                'type' => Transaction::TYPE_DEPOSIT,
             ], ['createdAt' => 'DESC']);
 
         return $this->render('deposit/history.html.twig', [

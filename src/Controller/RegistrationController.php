@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
 use App\Entity\Transaction;
+use App\Entity\User;
 use App\Form\RegistrationFormType;
 use App\Security\AppLoginAuthenticator;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,11 +18,11 @@ class RegistrationController extends AbstractController
 {
     #[Route('/register', name: 'app_register')]
     public function register(
-        Request $request, 
-        UserPasswordHasherInterface $userPasswordHasher, 
+        Request $request,
+        UserPasswordHasherInterface $userPasswordHasher,
         EntityManagerInterface $entityManager,
         UserAuthenticatorInterface $userAuthenticator,
-        AppLoginAuthenticator $authenticator
+        AppLoginAuthenticator $authenticator,
     ): Response {
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
@@ -32,7 +32,7 @@ class RegistrationController extends AbstractController
             // Set initial balance for new users
             $welcomeBonusAmount = 100.00; // $100 welcome bonus
             $user->setBalance($welcomeBonusAmount);
-            
+
             // Encode the plain password
             $user->setPassword(
                 $userPasswordHasher->hashPassword(
@@ -59,7 +59,7 @@ class RegistrationController extends AbstractController
             $welcomeTransaction->setGameSession(null);
             $welcomeTransaction->setMetadata([
                 'bonus_type' => 'welcome',
-                'reason' => 'New player registration'
+                'reason' => 'New player registration',
             ]);
 
             $entityManager->persist($welcomeTransaction);

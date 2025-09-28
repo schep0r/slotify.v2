@@ -2,9 +2,9 @@
 
 namespace App\Command;
 
+use App\Engines\SlotGameEngine;
 use App\Entity\Game;
 use App\Entity\User;
-use App\Engines\SlotGameEngine;
 use App\Repository\GameRepository;
 use App\Repository\UserRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -22,7 +22,7 @@ class TestSlotCommand extends Command
     public function __construct(
         private SlotGameEngine $slotGameEngine,
         private GameRepository $gameRepository,
-        private UserRepository $userRepository
+        private UserRepository $userRepository,
     ) {
         parent::__construct();
     }
@@ -38,11 +38,13 @@ class TestSlotCommand extends Command
 
             if (!$game) {
                 $io->error('No active games found');
+
                 return Command::FAILURE;
             }
 
             if (!$user) {
                 $io->error('No users found');
+
                 return Command::FAILURE;
             }
 
@@ -62,9 +64,9 @@ class TestSlotCommand extends Command
             $io->table(
                 ['Property', 'Value'],
                 [
-                    ['Bet Amount', '$' . number_format($result->betAmount, 2)],
-                    ['Win Amount', '$' . number_format($result->winAmount, 2)],
-                    ['New Balance', '$' . number_format($result->newBalance, 2)],
+                    ['Bet Amount', '$'.number_format($result->betAmount, 2)],
+                    ['Win Amount', '$'.number_format($result->winAmount, 2)],
+                    ['New Balance', '$'.number_format($result->newBalance, 2)],
                     ['Visible Symbols', json_encode($result->gameData->visibleSymbols)],
                     ['Winning Lines', count($result->gameData->winningLines)],
                 ]
@@ -72,8 +74,9 @@ class TestSlotCommand extends Command
 
             return Command::SUCCESS;
         } catch (\Exception $e) {
-            $io->error('Slot engine test failed: ' . $e->getMessage());
-            $io->error('Stack trace: ' . $e->getTraceAsString());
+            $io->error('Slot engine test failed: '.$e->getMessage());
+            $io->error('Stack trace: '.$e->getTraceAsString());
+
             return Command::FAILURE;
         }
     }

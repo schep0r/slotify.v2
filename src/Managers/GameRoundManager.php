@@ -7,7 +7,6 @@ namespace App\Managers;
 use App\Entity\GameRound;
 use App\Entity\GameSession;
 use App\Entity\User;
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -64,7 +63,7 @@ class GameRoundManager
             ->setIpAddress($ip)
             ->setUserAgent($ua)
             ->setStatus('completed')
-            ->setComplitedAt(new DateTimeImmutable())
+            ->setComplitedAt(new \DateTimeImmutable())
             ->setExtraData($spinData['extra_data'] ?? []);
 
         // Very simple completion hash (deterministic): adjust as needed
@@ -137,7 +136,7 @@ class GameRoundManager
      */
     public function cancelRound(GameRound $gameRound, string $reason = 'technical_error'): bool
     {
-        if ($gameRound->getStatus() !== 'completed') {
+        if ('completed' !== $gameRound->getStatus()) {
             return false;
         }
 
@@ -152,7 +151,7 @@ class GameRoundManager
         // Update round status & extra data
         $extra = $gameRound->getExtraData() ?? [];
         $extra['cancellation_reason'] = $reason;
-        $extra['cancelled_at'] = (new DateTimeImmutable())->format(DATE_ATOM);
+        $extra['cancelled_at'] = (new \DateTimeImmutable())->format(DATE_ATOM);
         $extra['original_balance_after'] = $gameRound->getBalanceAfter();
 
         $gameRound
@@ -234,10 +233,10 @@ class GameRoundManager
             $sumWin += (float) $r->getWinAmount();
             $sumNet += (float) $r->getNetResult();
             if ((float) $r->getWinAmount() > 0) {
-                $winning++;
+                ++$winning;
             }
             if ($r->isBonusRound()) {
-                $bonus++;
+                ++$bonus;
             }
             $biggestWin = max($biggestWin, (float) $r->getWinAmount());
         }
@@ -303,7 +302,7 @@ class GameRoundManager
      */
     public function archiveOldRounds(int $daysOld = 90): int
     {
-        $cutoffDate = (new DateTimeImmutable())->modify('-' . $daysOld . ' days');
+        $cutoffDate = (new \DateTimeImmutable())->modify('-'.$daysOld.' days');
 
         $qb = $this->entityManager->createQueryBuilder()
             ->delete(GameRound::class, 'gr')

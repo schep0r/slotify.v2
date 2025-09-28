@@ -15,7 +15,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class TransactionController extends AbstractController
 {
     public function __construct(
-        private TransactionRepository $transactionRepository
+        private TransactionRepository $transactionRepository,
     ) {
     }
 
@@ -34,7 +34,7 @@ class TransactionController extends AbstractController
             Transaction::TYPE_WIN,
             Transaction::TYPE_WITHDRAWAL,
             Transaction::TYPE_REFUND,
-            Transaction::TYPE_ADJUSTMENT
+            Transaction::TYPE_ADJUSTMENT,
         ])) {
             $criteria['type'] = $type;
         }

@@ -7,7 +7,6 @@ namespace App\Managers;
 use App\Contracts\TransactionManagerInterface;
 use App\Entity\GameSession;
 use App\Entity\Transaction;
-use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 

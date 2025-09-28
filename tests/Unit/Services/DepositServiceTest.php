@@ -135,8 +135,10 @@ class DepositServiceTest extends TestCase
                     $this->assertEquals($user, $entity->getPlayer());
                     $this->assertEquals(PaymentMethod::CARD->value, $entity->getPaymentMethod());
                     $this->assertNull($entity->getGameSession()); // Deposits don't have game sessions
+
                     return true;
                 }
+
                 return false;
             }));
 

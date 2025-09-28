@@ -3,8 +3,8 @@
 namespace App\Controller;
 
 use App\DTOs\GameResultDto;
-use App\Entity\Game;
 use App\Engines\SlotGameEngine;
+use App\Entity\Game;
 use App\Form\SpinType;
 use App\Repository\GameRepository;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -21,7 +21,7 @@ class GameController extends AbstractController
 {
     public function __construct(
         private GameRepository $gameRepository,
-        private SlotGameEngine $slotGameEngine
+        private SlotGameEngine $slotGameEngine,
     ) {
     }
 

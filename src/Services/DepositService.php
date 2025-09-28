@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Entity\Transaction;
 use App\Entity\User;
 use App\Enums\PaymentMethod;
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 
@@ -13,7 +12,7 @@ readonly class DepositService
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -27,6 +26,7 @@ readonly class DepositService
 
             if (!$paymentResult['success']) {
                 $this->entityManager->rollback();
+
                 return null;
             }
 
@@ -98,7 +98,7 @@ readonly class DepositService
                 'transaction_id' => 'card_'.uniqid(),
                 'gateway' => 'stripe',
                 'card_last4' => '****',
-                'processed_at' => (new DateTimeImmutable())->format('c'),
+                'processed_at' => (new \DateTimeImmutable())->format('c'),
             ],
         ];
     }
@@ -116,7 +116,7 @@ readonly class DepositService
                 'transaction_id' => 'pp_'.uniqid(),
                 'gateway' => 'paypal',
                 'payer_email' => $user->getEmail(),
-                'processed_at' => (new DateTimeImmutable())->format('c'),
+                'processed_at' => (new \DateTimeImmutable())->format('c'),
             ],
         ];
     }

@@ -41,7 +41,7 @@ class SpinType extends AbstractType
                     'label' => 'Select Paylines',
                     'choices' => $gamePaylines,
                     'multiple' => true,
-                    'data' => [0]
+                    'data' => [0],
                 ]
             )
             ->add(

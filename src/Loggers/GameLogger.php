@@ -17,7 +17,7 @@ class GameLogger implements GameLoggerInterface
 
     public function logGameRound(
         GameSession $gameSession,
-        array $spinData
+        array $spinData,
     ): void {
         $this->gameRoundManager->processSpin($gameSession, $spinData);
     }
