@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Generators;
+namespace App\Generator;
 
 use App\Contracts\RandomNumberGeneratorInterface;
 use App\Contracts\ReelGeneratorInterface;

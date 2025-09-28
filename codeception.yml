@@ -1,0 +1,25 @@
+namespace: App\Tests\Codeception
+support_namespace: Support
+paths:
+    tests: tests/Codeception
+    output: tests/Codeception/_output
+    data: tests/Codeception/Support/Data
+    support: tests/Codeception/Support
+    envs: tests/Codeception/_envs
+actor_suffix: Tester
+extensions:
+    enabled:
+        - Codeception\Extension\RunFailed
+params:
+    - .env
+    - .env.test
+settings:
+    shuffle: true
+    colors: true
+    report_useless_tests: true
+coverage:
+    enabled: true
+    include:
+        - src/*
+    low_limit: 50
+    high_limit: 90

@@ -107,6 +107,10 @@
         }
     },
     "require-dev": {
+        "codeception/module-asserts": "^3.2",
+        "codeception/module-doctrine": "^3.2",
+        "codeception/module-phpbrowser": "^3.0",
+        "codeception/module-symfony": "*",
         "doctrine/doctrine-fixtures-bundle": "^4.1",
         "friendsofphp/php-cs-fixer": "^3.88",
         "phpstan/phpstan": "^2.1",

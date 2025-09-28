@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Generators;
+namespace App\Generator;
 
 use App\Contracts\RandomNumberGeneratorInterface;
 
