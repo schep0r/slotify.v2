@@ -9,7 +9,7 @@ use App\Contracts\ReelGeneratorInterface;
 use App\DTOs\ReelVisibilityDto;
 use App\Entity\Game;
 
-class ReelGenerator implements ReelGeneratorInterface
+readonly class ReelGenerator implements ReelGeneratorInterface
 {
     public function __construct(private RandomNumberGeneratorInterface $rng)
     {
