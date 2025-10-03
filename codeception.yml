@@ -1,11 +1,11 @@
-namespace: App\Tests\Codeception
+namespace: App\Tests
 support_namespace: Support
 paths:
-    tests: tests/Codeception
-    output: tests/Codeception/_output
-    data: tests/Codeception/Support/Data
-    support: tests/Codeception/Support
-    envs: tests/Codeception/_envs
+    tests: tests
+    output: tests/_output
+    data: tests/Support/Data
+    support: tests/Support
+    envs: tests/_envs
 actor_suffix: Tester
 extensions:
     enabled:
@@ -17,9 +17,14 @@ settings:
     shuffle: true
     colors: true
     report_useless_tests: true
+    strict_xml: true
 coverage:
     enabled: true
     include:
         - src/*
+    exclude:
+        - src/Kernel.php
+        - src/DataFixtures/*
     low_limit: 50
     high_limit: 90
+    show_uncovered: true

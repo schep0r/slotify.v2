@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Codeception\Support;
+namespace App\Tests\Support;
 
 /**
  * Inherited Methods
@@ -22,7 +22,7 @@ namespace App\Tests\Codeception\Support;
 */
 class UnitTester extends \Codeception\Actor
 {
-    use \App\Tests\Codeception\Support\_generated\UnitTesterActions;
+    use \App\Tests\Support\_generated\UnitTesterActions;
 
     /**
      * Define custom actions here

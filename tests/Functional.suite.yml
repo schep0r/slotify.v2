@@ -1,0 +1,14 @@
+# Codeception Test Suite Configuration
+#
+# Suite for functional tests with full Symfony and database integration
+
+actor: FunctionalTester
+modules:
+    enabled:
+        - Asserts
+        - Symfony:
+            app_path: 'src'
+            environment: 'test'
+        - Doctrine:
+            depends: Symfony
+            cleanup: true

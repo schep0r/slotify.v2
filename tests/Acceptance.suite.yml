@@ -1,14 +1,17 @@
 # Codeception Acceptance Test Suite Configuration
 #
-# Perform tests in a browser by either emulating one using PhpBrowser, or in a real browser using WebDriver.
-# If you need both WebDriver and PhpBrowser tests, create a separate suite for each.
+# End-to-end tests through HTTP requests for API testing
 
 actor: AcceptanceTester
 modules:
     enabled:
         - PhpBrowser:
             url: http://localhost:8000
-# Add Codeception\Step\Retry trait to AcceptanceTester to enable retries
+        - REST:
+            url: http://localhost:8000
+            depends: PhpBrowser
+        - Asserts
+
 step_decorators:
     - Codeception\Step\ConditionalAssertion
     - Codeception\Step\TryTo

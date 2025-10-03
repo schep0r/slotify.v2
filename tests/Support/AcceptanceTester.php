@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Codeception\Support;
-
-use App\Tests\Codeception\Support\_generated;
+namespace App\Tests\Support;
 
 /**
  * Inherited Methods
@@ -22,9 +20,9 @@ use App\Tests\Codeception\Support\_generated;
  *
  * @SuppressWarnings(PHPMD)
 */
-class FunctionalTester extends \Codeception\Actor
+class AcceptanceTester extends \Codeception\Actor
 {
-    use _generated\FunctionalTesterActions;
+    use \App\Tests\Support\_generated\AcceptanceTesterActions;
 
     /**
      * Define custom actions here

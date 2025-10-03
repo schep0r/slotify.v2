@@ -15,7 +15,7 @@
 - **Symfony UX (Turbo/Stimulus)** - Frontend enhancement
 
 ## Development Tools
-- **PHPUnit 12.3** - Testing framework
+- **Codeception** - Primary testing framework (Unit, Functional, Acceptance)
 - **Symfony Maker Bundle** - Code generation
 - **Web Profiler** - Development debugging
 - **Docker Compose** - Local development environment
@@ -40,10 +40,22 @@ php bin/console cache:clear
 ### Testing
 ```bash
 # Run all tests
-php bin/phpunit
+composer test
+# or
+vendor/bin/codecept run
 
 # Run tests with coverage
-php bin/phpunit --coverage-html coverage/
+composer test-coverage
+# or
+vendor/bin/codecept run --coverage --coverage-html
+
+# Run specific test suites
+composer test-unit          # Unit tests only
+composer test-functional    # Functional tests only
+composer test-acceptance    # Acceptance tests only
+
+# Build Codeception actors
+vendor/bin/codecept build
 ```
 
 ### Database Operations

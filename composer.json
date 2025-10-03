@@ -7,11 +7,11 @@
         "php": ">=8.3",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "doctrine/dbal": "^3",
-        "doctrine/doctrine-bundle": "^2.16",
-        "doctrine/doctrine-migrations-bundle": "^3.4",
-        "doctrine/orm": "^3.5",
-        "phpdocumentor/reflection-docblock": "^5.6",
+        "doctrine/dbal": "^3.10.2",
+        "doctrine/doctrine-bundle": "^2.16.2",
+        "doctrine/doctrine-migrations-bundle": "^3.4.2",
+        "doctrine/orm": "^3.5.2",
+        "phpdocumentor/reflection-docblock": "^5.6.3",
         "phpstan/phpdoc-parser": "^2.3",
         "symfony/asset": "7.3.*",
         "symfony/asset-mapper": "7.3.*",
@@ -19,14 +19,14 @@
         "symfony/doctrine-messenger": "7.3.*",
         "symfony/dotenv": "7.3.*",
         "symfony/expression-language": "7.3.*",
-        "symfony/flex": "^2",
+        "symfony/flex": "^2.8.2",
         "symfony/form": "7.3.*",
         "symfony/framework-bundle": "7.3.*",
         "symfony/http-client": "7.3.*",
         "symfony/intl": "7.3.*",
         "symfony/mailer": "7.3.*",
         "symfony/mime": "7.3.*",
-        "symfony/monolog-bundle": "^3.0",
+        "symfony/monolog-bundle": "^3.10",
         "symfony/notifier": "7.3.*",
         "symfony/process": "7.3.*",
         "symfony/property-access": "7.3.*",
@@ -44,8 +44,8 @@
         "symfony/web-link": "7.3.*",
         "symfony/yaml": "7.3.*",
         "symfonycasts/tailwind-bundle": "^0.11.1",
-        "twig/extra-bundle": "^2.12|^3.0",
-        "twig/twig": "^2.12|^3.0"
+        "twig/extra-bundle": "^2.12|^3.21",
+        "twig/twig": "^2.12|^3.21.1"
     },
     "config": {
         "allow-plugins": {
@@ -88,13 +88,13 @@
         "post-update-cmd": [
             "@auto-scripts"
         ],
-        "test": "php bin/phpunit",
-        "test-coverage": "XDEBUG_MODE=coverage php bin/phpunit --coverage-text --coverage-clover=coverage.xml",
-        "test-coverage-html": "XDEBUG_MODE=coverage php bin/phpunit --coverage-html=coverage",
-        "check-coverage": [
-            "@test-coverage",
-            "php bin/check-coverage"
-        ]
+        "test": "vendor/bin/codecept run",
+        "test-unit": "vendor/bin/codecept run Unit",
+        "test-functional": "vendor/bin/codecept run Functional",
+        "test-acceptance": "vendor/bin/codecept run Acceptance",
+        "test-coverage": "XDEBUG_MODE=coverage vendor/bin/codecept run --coverage --coverage-xml --coverage-html",
+        "test-coverage-text": "XDEBUG_MODE=coverage vendor/bin/codecept run --coverage --coverage-text",
+        "codecept-build": "vendor/bin/codecept build"
     },
     "conflict": {
         "symfony/symfony": "*"
@@ -109,16 +109,17 @@
     "require-dev": {
         "codeception/module-asserts": "^3.2",
         "codeception/module-doctrine": "^3.2",
-        "codeception/module-phpbrowser": "^3.0",
-        "codeception/module-symfony": "*",
+        "codeception/module-phpbrowser": "^3.0.2",
+        "codeception/module-rest": "^3.4",
+        "codeception/module-symfony": ">=3.7.1",
         "doctrine/doctrine-fixtures-bundle": "^4.1",
-        "friendsofphp/php-cs-fixer": "^3.88",
-        "phpstan/phpstan": "^2.1",
-        "phpunit/phpunit": "^12.3",
+        "friendsofphp/php-cs-fixer": "^3.88.2",
+        "phpstan/phpstan": "^2.1.29",
+        "phpunit/phpunit": "^12.3.15",
         "symfony/browser-kit": "7.3.*",
         "symfony/css-selector": "7.3.*",
         "symfony/debug-bundle": "7.3.*",
-        "symfony/maker-bundle": "^1.0",
+        "symfony/maker-bundle": "^1.64",
         "symfony/stopwatch": "7.3.*",
         "symfony/web-profiler-bundle": "7.3.*"
     }
