@@ -67,7 +67,7 @@ jobs:
 
     - name: Run Codeception tests with coverage
       run: |
-        XDEBUG_MODE=coverage vendor/bin/codecept run --coverage --coverage-xml --coverage-html --junit
+        XDEBUG_MODE=coverage vendor/bin/codecept run --coverage --coverage-xml --coverage-html --xml
 
     - name: Check coverage thresholds
       run: |
