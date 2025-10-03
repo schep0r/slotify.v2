@@ -20,7 +20,7 @@ settings:
     strict_xml: true
 coverage:
     enabled: true
-    remote: true
+    remote: false
     include:
         - src/*
     exclude:

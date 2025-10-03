@@ -65,9 +65,13 @@ jobs:
     - name: Build Codeception
       run: vendor/bin/codecept build
 
-    - name: Run Codeception tests with coverage
+    - name: Run Codeception tests
       run: |
-        XDEBUG_MODE=coverage vendor/bin/codecept run --coverage --xml
+        XDEBUG_MODE=coverage vendor/bin/codecept run
+
+    - name: Run Codeception Unit tests with coverage
+      run: |
+        XDEBUG_MODE=coverage vendor/bin/codecept run Unit --coverage --coverage-xml --coverage-html --xml
 
     - name: Check coverage thresholds
       run: |

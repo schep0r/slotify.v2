@@ -3,7 +3,7 @@
 # Suite for functional tests with full Symfony and database integration
 
 actor: FunctionalTester
-coverage: true
+coverage: false
 modules:
     enabled:
         - Asserts
