@@ -3,6 +3,7 @@
 # End-to-end tests through HTTP requests for API testing
 
 actor: AcceptanceTester
+coverage: false
 modules:
     enabled:
         - PhpBrowser:

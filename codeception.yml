@@ -28,10 +28,3 @@ coverage:
     low_limit: 50
     high_limit: 90
     show_uncovered: true
-suites:
-    Unit:
-        coverage: true
-    Functional:
-        coverage: true
-    Acceptance:
-        coverage: false

@@ -3,6 +3,7 @@
 # Suite for unit tests with Symfony integration
 
 actor: UnitTester
+coverage: true
 modules:
     enabled:
         - Asserts
