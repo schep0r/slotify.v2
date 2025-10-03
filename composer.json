@@ -92,8 +92,12 @@
         "test-unit": "vendor/bin/codecept run Unit",
         "test-functional": "vendor/bin/codecept run Functional",
         "test-acceptance": "vendor/bin/codecept run Acceptance",
-        "test-coverage": "XDEBUG_MODE=coverage vendor/bin/codecept run --coverage --coverage-xml --coverage-html --xml",
-        "test-coverage-text": "XDEBUG_MODE=coverage vendor/bin/codecept run --coverage --coverage-text",
+        "test-coverage": "XDEBUG_MODE=coverage vendor/bin/codecept run Unit --coverage --coverage-xml --coverage-html --xml",
+        "test-coverage-all": [
+            "XDEBUG_MODE=coverage vendor/bin/codecept run Unit --coverage --coverage-xml --coverage-html --xml",
+            "XDEBUG_MODE=coverage vendor/bin/codecept run Functional --coverage --coverage-xml --coverage-html --xml"
+        ],
+        "test-coverage-text": "XDEBUG_MODE=coverage vendor/bin/codecept run Unit --coverage --coverage-text",
         "codecept-build": "vendor/bin/codecept build"
     },
     "conflict": {
